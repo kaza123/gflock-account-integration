@@ -210,15 +210,15 @@ public class TransactionController {
         return setTerminalDetail;
     }
 
-    public boolean saveAccount(int selectedTerminal, Integer loginUser, ArrayList<Object[]> terminalDetail, String date) {
+    public Object[] saveAccount(int selectedTerminal, Integer loginUser, ArrayList<Object[]> terminalDetail, String date) {
         Connection accConnection = null;
-        boolean save = false;
+        Object[] saveAccount=new Object[]{};
 
         try {
             accConnection = accountDataSourceWrapper.getConnection();
             //Set auto commit as false.
             accConnection.setAutoCommit(false);
-            save = AccountController.saveAccount(selectedTerminal, date, loginUser,terminalDetail, accConnection);
+            saveAccount = AccountController.saveAccount(selectedTerminal, date, loginUser, terminalDetail, accConnection);
 
             //commit
             accConnection.commit();
@@ -240,6 +240,39 @@ public class TransactionController {
 
             }
         }
-        return save;
+        return saveAccount;
+    }
+
+    public Integer getNotCheckDataCount(String date) {
+        Connection accConnection = null;
+        Integer count=0;
+
+        try {
+            accConnection = accountDataSourceWrapper.getConnection();
+            //Set auto commit as false.
+            accConnection.setAutoCommit(false);
+            count = AccountController.getNotCheckDataCount(date,accConnection);
+
+            //commit
+            accConnection.commit();
+
+            //Clean-up environment
+            accConnection.close();
+
+        } catch (Exception e) {
+            try {
+                System.out.println("COMPILE ERROR ! , check the data and try again !");
+                System.out.println(e);
+
+                if (accConnection != null) {
+                    accConnection.rollback();
+                }
+                System.out.println("Transactions Rollbacked !");
+            } catch (SQLException se2) {
+                System.out.println("Can't find database Connections !");
+
+            }
+        }
+        return count;
     }
 }

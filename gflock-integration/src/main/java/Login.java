@@ -94,7 +94,8 @@ public class Login extends javax.swing.JFrame {
         });
         jPanel1.add(btnLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 230, 110, -1));
 
-        lblwrong.setForeground(new java.awt.Color(102, 0, 0));
+        lblwrong.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        lblwrong.setForeground(new java.awt.Color(255, 51, 51));
         lblwrong.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblwrong.setText("User name or password is incorret !");
         jPanel1.add(lblwrong, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 270, 240, -1));
@@ -124,10 +125,11 @@ public class Login extends javax.swing.JFrame {
         try {
             System.out.println("login");
 //          getUserLogin
-            System.out.println(txtUserName.getText() + " - " + txtLoginPswd.getText());
             Integer loginUser = SyncController.getInstance().checkLoginUser(txtUserName.getText(), txtLoginPswd.getText());
             if (loginUser <= 0) {
                 lblwrong.setVisible(true);
+                txtLoginPswd.setText(null);
+                txtUserName.setText(null);
             } else {
                 lblwrong.setVisible(false);
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

@@ -11,11 +11,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import controller.TransactionController;
+import java.awt.BorderLayout;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import sync_controller.SyncController;
@@ -31,14 +36,19 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
     DefaultTableModel model = new DefaultTableModel();
     private int selectedTerminal;
     private ArrayList<Object[]> terminalDetail;
+//    JDialog dialog = new JDialog(this, true);
+    JSplitPane pain;
+    public JLabel lblMain = new JLabel("Select a terminal to view details !", JLabel.CENTER);
+    ;
+    JSplitPane splitPane;
 
     public SystemIntegrationSyncGUI() {
         this.terminalDetail = new ArrayList<>();
         this.selectedTerminal = -1;
         initComponents();
         model = (DefaultTableModel) tblData.getModel();
-
         initOthers();
+        pain = splitePain;
         lblProcess.setText("");
 
         try {
@@ -58,39 +68,50 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
 
     @SuppressWarnings("unchecked")
     private void initOthers() {
-        setTitle("Account Integration System");
-        setLocationRelativeTo(null);
-        txtLog.setEditable(false);
-        // String date = TransactionController.getInstance().getSyncDate();
-        String date = "2018-06-19";
-        txtDate.setText(date);
+        try {
+            setTitle("Account Integration System");
+            setLocationRelativeTo(null);
+            txtLog.setEditable(false);
+            String date = getSyncDate();
+            txtDate.setText(date);
 
-        //set company
-        //String companyName = TransactionController.getInstance().getCompanyName();
-        String companyName = "GFlock";
-        lblCompanyName.setText(companyName);
+            //set company
+            String companyName = TransactionController.getInstance().getCompanyName();
+            lblCompanyName.setText(companyName);
 
-        //table decoration
-        tblData.getColumnModel().getColumn(0).setPreferredWidth(200);
-        tblData.getColumnModel().getColumn(1).setPreferredWidth(50);
-        tblData.getColumnModel().getColumn(2).setPreferredWidth(50);
-        tblData.getColumnModel().getColumn(3).setPreferredWidth(50);
-        tblData.getColumnModel().getColumn(4).setWidth(0);
-        tblData.getColumnModel().getColumn(4).setMinWidth(0);
-        tblData.getColumnModel().getColumn(4).setMaxWidth(0);
-        tblData.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+//table decoration
+            tblData.getColumnModel().getColumn(0).setPreferredWidth(200);
+            tblData.getColumnModel().getColumn(1).setPreferredWidth(50);
+            tblData.getColumnModel().getColumn(2).setPreferredWidth(50);
+            tblData.getColumnModel().getColumn(3).setPreferredWidth(50);
+            tblData.getColumnModel().getColumn(4).setWidth(0);
+            tblData.getColumnModel().getColumn(4).setMinWidth(0);
+            tblData.getColumnModel().getColumn(4).setMaxWidth(0);
+            tblData.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
-        DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
-        leftRenderer.setHorizontalAlignment(JLabel.LEFT);
-        DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
-        rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
-        tblData.getColumnModel().getColumn(0).setCellRenderer(leftRenderer);
-        tblData.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
-        tblData.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
-        tblData.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
+            DefaultTableCellRenderer leftRenderer = new DefaultTableCellRenderer();
+            leftRenderer.setHorizontalAlignment(JLabel.LEFT);
+            DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+            rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+            tblData.getColumnModel().getColumn(0).setCellRenderer(leftRenderer);
+            tblData.getColumnModel().getColumn(1).setCellRenderer(rightRenderer);
+            tblData.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
+            tblData.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
 
-        TextAreaOutputStream textAreaOutputStream = new TextAreaOutputStream(txtLog);
-        System.setOut(new PrintStream(textAreaOutputStream));
+            TextAreaOutputStream textAreaOutputStream = new TextAreaOutputStream(txtLog);
+            System.setOut(new PrintStream(textAreaOutputStream));
+
+//            ImageIcon loading2 = new ImageIcon("./images/loder.gif");
+////            inputTextArea = new JLabel("Select a terminal to view details !", JLabel.CENTER);
+//            inputTextArea = new JLabel("Select a terminal to view details !", JLabel.CENTER);
+//            outputTextArea = txtLog;
+            // put two TextArea to JScrollPane so text can be scrolled when too long
+//            JScrollPane scrollPanelLeft = new JScrollPane(tblData);
+            setJSplitPane("main");
+
+        } catch (SQLException ex) {
+            Logger.getLogger(SystemIntegrationSyncGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void setLoginUser(Integer loginUser) {
@@ -113,13 +134,14 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
         btnDayComplete = new javax.swing.JButton();
         lblCompanyName = new javax.swing.JLabel();
         btnTremi5 = new javax.swing.JButton();
-        jSplitPane1 = new javax.swing.JSplitPane();
+        splitePain = new javax.swing.JSplitPane();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtLog = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblData = new javax.swing.JTable();
         btnSync = new javax.swing.JButton();
+        panel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(550, 330));
@@ -189,11 +211,11 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
             }
         });
 
-        jSplitPane1.setDividerLocation(470);
-        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        splitePain.setDividerLocation(470);
+        splitePain.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jLabel2.setText("jLabel2");
-        jSplitPane1.setTopComponent(jLabel2);
+        splitePain.setTopComponent(jLabel2);
 
         txtLog.setBackground(new java.awt.Color(0, 0, 0));
         txtLog.setColumns(20);
@@ -201,7 +223,7 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
         txtLog.setRows(5);
         jScrollPane2.setViewportView(txtLog);
 
-        jSplitPane1.setRightComponent(jScrollPane2);
+        splitePain.setRightComponent(jScrollPane2);
 
         tblData.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -229,7 +251,7 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
         tblData.setRowHeight(20);
         jScrollPane1.setViewportView(tblData);
 
-        jSplitPane1.setTopComponent(jScrollPane1);
+        splitePain.setTopComponent(jScrollPane1);
 
         btnSync.setText("Sync");
         btnSync.setPreferredSize(new java.awt.Dimension(75, 23));
@@ -238,6 +260,8 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
                 btnSyncActionPerformed(evt);
             }
         });
+
+        panel.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -249,13 +273,15 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnDayComplete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnTremi1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnTremi5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(btnTremi4, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnTremi3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnTremi2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(btnTremi5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnTremi2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnTremi1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnTremi3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnTremi4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(splitePain, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -269,11 +295,11 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
                                 .addComponent(btnSync, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(1, 1, 1)
                                 .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jSplitPane1))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -299,9 +325,11 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
                         .addComponent(btnTremi4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnTremi5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(splitePain, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnDayComplete))
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 580, Short.MAX_VALUE))
+                    .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -317,11 +345,11 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
         txtLog.setText("");
         lblProcess.setText("");
         model.setRowCount(0);
+        selectedTerminal = -1;
         try {
-//            String date = TransactionController.getInstance().getSyncDate();
-            String date = "2018-06-19";
+            String date = getSyncDate();
             txtDate.setText(date);
-            txtLog.setText("Data is cleared !");
+            System.out.println("Data is cleared !");
 
             setButtonValue(getDetailCount(txtDate.getText(), terminalList));
         } catch (SQLException ex) {
@@ -332,40 +360,148 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
 
     private void btnTremi3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTremi3ActionPerformed
         if (optionPain() == 0) {
-            int temId = 3;
-            setTerminalDetail(temId);
+            setJSplitPane("loding");
+            new SwingWorker<Void, String>() {
+                Integer dataSize;
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    // Worken hard or hardly worken...
+                    dataSize = setTerminalDetail(3);
+//                    Thread.sleep(2000);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    if (dataSize <= 0) {
+                        setJSplitPane("main");
+                    } else {
+                        setJSplitPane("data");
+                    }
+
+                }
+            }.execute();
         }
     }//GEN-LAST:event_btnTremi3ActionPerformed
 
     private void btnTremi1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTremi1ActionPerformed
         if (optionPain() == 0) {
-            int temId = 1;
-            setTerminalDetail(temId);
+            setJSplitPane("loding");
+            Integer dataSize = setTerminalDetail(1);
+            if (dataSize <= 0) {
+                setJSplitPane("main");
+            } else {
+                setJSplitPane("data");
+            }
         }
+//
+//            ImageIcon loading2 = new ImageIcon("./images/loder.gif");
+//            frame.add(new JLabel("", loading2, JLabel.CENTER));
+//
+//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//            frame.setSize(400, 300);
+//            frame.setUndecorated(true);
+//            frame.setOpacity(0.5f);
+//            frame.setVisible(true);
+//            frame.setLocationRelativeTo(null);
+////            int temId = 1;
+////            setTerminalDetail(temId);
+//
+//            System.out.println("");
+//        }
+//            try {
+//                System.out.println("A");
+////                JFrame frame = new JFrame("Test");
+////
+////                ImageIcon loading2 = new ImageIcon("./images/loder.gif");
+////                frame.add(new JLabel("Image3 ", loading2, JLabel.CENTER));
+////
+////                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+////                frame.setSize(400, 300);
+////                frame.setUndecorated(true);
+////                frame.setOpacity(0.5f);
+////                frame.setVisible(true);
+//                Thread.sleep(500);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(SystemIntegrationSyncGUI.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//
+//            int temId = 1;
+//            
+//        }
 
     }//GEN-LAST:event_btnTremi1ActionPerformed
 
     private void btnTremi4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTremi4ActionPerformed
-        if (optionPain() == 0) {
-            int temId = 4;
-            setTerminalDetail(temId);
+       if (optionPain() == 0) {
+            setJSplitPane("loding");
+            new SwingWorker<Void, String>() {
+                Integer dataSize;
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    // Worken hard or hardly worken...
+                    dataSize = setTerminalDetail(2);
+//                    Thread.sleep(2000);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    if (dataSize <= 0) {
+                        setJSplitPane("main");
+                    } else {
+                        setJSplitPane("data");
+                    }
+
+                }
+            }.execute();
         }
     }//GEN-LAST:event_btnTremi4ActionPerformed
 
     private void btnTremi2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTremi2ActionPerformed
         if (optionPain() == 0) {
-            int temId = 2;
-            setTerminalDetail(temId);
+            setJSplitPane("loding");
+            new SwingWorker<Void, String>() {
+                Integer dataSize;
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    // Worken hard or hardly worken...
+                    dataSize = setTerminalDetail(4);
+//                    Thread.sleep(2000);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    if (dataSize <= 0) {
+                        setJSplitPane("main");
+                    } else {
+                        setJSplitPane("data");
+                    }
+
+                }
+            }.execute();
         }
+//
+
     }//GEN-LAST:event_btnTremi2ActionPerformed
 
     private void btnDayCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDayCompleteActionPerformed
         if (optionPain() == 0) {
             try {
-                String date = TransactionController.getInstance().getNextDate(txtDate.getText());
-                txtDate.setText(date);
-//                btnClear.doClick();
+                Integer count = TransactionController.getInstance().getNotCheckDataCount(txtDate.getText());
+                if (count > 0) {
+                    System.out.println("There are " + count + " detail(s) to sync ! please sync all !");
+                } else {
+                    String date = TransactionController.getInstance().getNextDate(txtDate.getText());
+                    txtDate.setText(date);
+                    btnClear.doClick();
+                }
             } catch (SQLException ex) {
+                System.out.println(ex);
                 System.out.println("Can't find next date !");
                 Logger.getLogger(SystemIntegrationSyncGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -374,30 +510,53 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
 
     private void btnTremi5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTremi5ActionPerformed
         if (optionPain() == 0) {
-            int temId = 5;
-            setTerminalDetail(temId);
+            setJSplitPane("loding");
+            new SwingWorker<Void, String>() {
+                Integer dataSize;
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    // Worken hard or hardly worken...
+                    dataSize = setTerminalDetail(5);
+//                    Thread.sleep(2000);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    if (dataSize <= 0) {
+                        setJSplitPane("main");
+                    } else {
+                        setJSplitPane("data");
+                    }
+
+                }
+            }.execute();
         }
     }//GEN-LAST:event_btnTremi5ActionPerformed
 
     private void btnSyncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSyncActionPerformed
-        if (selectedTerminal == -1) {
-            System.out.println("Select a terminal to sync data !");
-            throw new RuntimeException("Select a terminal to sync data !");
-        }
-        System.out.println("processing terminal " + selectedTerminal + " data ");
-        System.out.println("date " + txtDate.getText());
-        try {
-            boolean save = TransactionController.getInstance().saveAccount(selectedTerminal, loginUser, terminalDetail, txtDate.getText());
-            if (save) {
-                btnClear.doClick();
-                System.out.println("terminal " + selectedTerminal + " sync success ");
-            } else {
-                JOptionPane.showMessageDialog(null, "terminal " + selectedTerminal + " sync fail !");
-
+        if (optionPain() == 0) {
+            if (selectedTerminal == -1) {
+                System.out.println("Select a terminal to sync data !");
+                throw new RuntimeException("Select a terminal to sync data !");
             }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            Logger.getLogger(SystemIntegrationSyncGUI.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("processing terminal " + selectedTerminal + " data ");
+            try {
+                Object[] saveObject = TransactionController.getInstance().saveAccount(selectedTerminal, loginUser, terminalDetail, txtDate.getText());
+                if (saveObject.length > 0) {
+                    btnClear.doClick();
+                    System.out.println("terminal " + selectedTerminal + " sync success ");
+                    System.out.println("Total Debit : " + saveObject[0] + " Total Credit : " + saveObject[1]);
+                    System.out.println("Search code is " + saveObject[2]);
+                } else {
+                    JOptionPane.showMessageDialog(null, "terminal " + selectedTerminal + " sync fail !");
+
+                }
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+                Logger.getLogger(SystemIntegrationSyncGUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
 
@@ -423,9 +582,10 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JLabel lblProcess;
+    private javax.swing.JPanel panel;
+    private javax.swing.JSplitPane splitePain;
     private javax.swing.JTable tblData;
     private javax.swing.JTextField txtDate;
     private javax.swing.JTextArea txtLog;
@@ -457,8 +617,9 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
         model.addRow(new Object[]{"", 0.00, amount1, amount2, ""});
     }
 
-    private void setTerminalDetail(int temId) {
+    private Integer setTerminalDetail(int temId) {
         selectedTerminal = temId;
+        model.setRowCount(0);
         try {
             lblProcess.setText("terminal " + temId + " is selected !");
             System.out.println("terminal " + temId + " is selected !");
@@ -471,5 +632,36 @@ public class SystemIntegrationSyncGUI extends javax.swing.JFrame {
             System.out.println(ex.getMessage());
             Logger.getLogger(SystemIntegrationSyncGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return terminalDetail.size();
+    }
+
+    private String getSyncDate() throws SQLException {
+        return TransactionController.getInstance().getSyncDate();
+    }
+
+    private Integer setJSplitPane(String label) {
+        JScrollPane scrollPanelLeft = new JScrollPane(lblMain);
+        JScrollPane scrollPanelRight = new JScrollPane(txtLog);
+        System.out.println(label);
+        panel.removeAll();
+
+        if ("main".equals(label)) {
+            scrollPanelLeft = new JScrollPane(lblMain);
+        } else if ("loding".equals(label)) {
+            ImageIcon loading2 = new ImageIcon("./images/loder.gif");
+            scrollPanelLeft = new JScrollPane(new JLabel("", loading2, JLabel.CENTER));
+        } else if ("data".equals(label)) {
+            scrollPanelLeft = new JScrollPane(tblData);
+        }
+
+        // put two JScrollPane into SplitPane 
+        splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                scrollPanelLeft, scrollPanelRight);
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerLocation(470);
+        panel.add(splitPane, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+        return 1;
     }
 }

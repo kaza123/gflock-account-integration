@@ -306,15 +306,15 @@ public class AccountService {
     }
 
     public ArrayList<Object[]> getSalesGroupByCategory(int temId, String date, Connection connection) throws SQLException {
-        String query = "select m_item.category, \n"
-                + "	ifnull(sum(pos_t_transaction_details.final_value),0.00) as sales\n"
-                + "from pos_t_transaction_details\n"
-                + "left join pos_t_transaction_summary on pos_t_transaction_summary.index_no=pos_t_transaction_details.tr_index_no\n"
-                + "left join m_item on m_item.barcode=pos_t_transaction_details.bar_code\n"
-                + "where pos_t_transaction_details.tr_det_type='item' and pos_t_transaction_summary.tr_type='invoice' \n"
-                + "and (2 is null or pos_t_transaction_summary.terminal_id=?)\n"
-                + "and pos_t_transaction_summary.tr_date=?\n"
-                + "group by m_item.category";
+        String query = "Select pos_m_item.cost_center, ifnull(sum(item_value),0.00) as total_item_value\n"
+                + "   from temp_tr_details \n"
+                + "   left join pos_m_item on pos_m_item.barcode=temp_tr_details.bar_code \n"
+                + "   Where tr_status=2 \n"
+                + "   and tr_type='invoice' \n"
+                + "   and tr_det_type='Item' \n"
+                + "   and terminal_id=?\n"
+                + "   and tr_date1=DATE_FORMAT(?,'%Y%m%d') and temp_tr_details.is_sync=0 \n"
+                + "   group by pos_m_item.cost_center";
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.setInt(1, temId);
         preparedStatement.setString(2, date);
@@ -324,6 +324,164 @@ public class AccountService {
             arrayList.add(new Object[]{"    " + rst.getString(1), rst.getBigDecimal(2)});
         }
         return arrayList;
+    }
+
+    public Integer getDeleteFefNo(Connection accConnection) throws SQLException {
+        String query = "select ifnull( max(t_acc_ledger.delete_ref_no)+1,1) as number\n"
+                + "from t_acc_ledger";
+        PreparedStatement preparedStatement = accConnection.prepareStatement(query);
+        ResultSet rst = preparedStatement.executeQuery();
+        if (rst.next()) {
+            return rst.getInt(1);
+        }
+        throw new RuntimeException("Can't find delete ref number !");
+    }
+
+    public Integer getCurrentFinancialYear(Connection accConnection) throws SQLException {
+        String query = "select m_financial_year.index_no\n"
+                + "from m_financial_year\n"
+                + "where m_financial_year.is_current=1";
+        PreparedStatement preparedStatement = accConnection.prepareStatement(query);
+        ResultSet rst = preparedStatement.executeQuery();
+        if (rst.next()) {
+            return rst.getInt(1);
+        }
+        throw new RuntimeException("Can't find current financial year !");
+    }
+
+    public Integer updateTrSum(int selectedTerminal, String date, Connection accConnection) throws SQLException {
+        String insertSql = "UPDATE pos_t_transaction_summary \n"
+                + "SET `is_sync`='1', `sync_date_time`=now()\n"
+                + "WHERE pos_t_transaction_summary.terminal_id=? \n"
+                + "and pos_t_transaction_summary.tr_date=? ";
+        PreparedStatement preparedStatement = accConnection.prepareStatement(insertSql);
+        preparedStatement.setInt(1, selectedTerminal);
+        preparedStatement.setString(2, date);
+
+        return preparedStatement.executeUpdate();
+    }
+
+    public Integer getAccSettingByName(String settingName, Connection accConnection) throws SQLException {
+        String query = "SELECT  `acc_account` FROM `m_acc_setting` WHERE name=? limit 1";
+        PreparedStatement preparedStatement = accConnection.prepareStatement(query);
+        preparedStatement.setString(1, settingName);
+        ResultSet rst = preparedStatement.executeQuery();
+        if (rst.next()) {
+            return rst.getInt(1);
+        }
+        throw new RuntimeException("Can't find Acc Setting from " + settingName);
+
+    }
+
+    public Integer getCostCenterByName(String costCenterName, Connection accConnection) throws SQLException {
+        String query = "select m_cost_center.index_no\n"
+                + "from m_cost_center\n"
+                + "where m_cost_center.name=trim(?) limit 1";
+        PreparedStatement preparedStatement = accConnection.prepareStatement(query);
+        preparedStatement.setString(1, costCenterName);
+        ResultSet rst = preparedStatement.executeQuery();
+        if (rst.next()) {
+            return rst.getInt(1);
+        }
+        throw new RuntimeException("Can't find cost center from " + costCenterName);
+    }
+
+    public ArrayList<Object[]> getLineDiscountByCategory(int temId, String date, Connection connection) throws SQLException {
+        String query = "select trim(pos_m_item.cost_center) as category,\n"
+                + "	ifnull(sum(pos_t_transaction_details.line_dis_amt1)+sum(pos_t_transaction_details.line_dis_amt2),0.00)  as val\n"
+                + "from pos_t_transaction_details\n"
+                + "left join pos_t_transaction_summary on pos_t_transaction_summary.index_no=pos_t_transaction_details.tr_index_no\n"
+                + "left join pos_m_item on pos_m_item.barcode=pos_t_transaction_details.bar_code\n"
+                + "where (2 is null or pos_t_transaction_summary.terminal_id=?)\n"
+                + "and pos_t_transaction_summary.tr_date=? and pos_t_transaction_summary.is_sync=0\n"
+                + "group by pos_m_item.cost_center\n"
+                + "HAVING val!=0";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, temId);
+        preparedStatement.setString(2, date);
+        ResultSet rst = preparedStatement.executeQuery();
+        ArrayList<Object[]> arrayList = new ArrayList<>();
+        while (rst.next()) {
+            arrayList.add(new Object[]{"    " + rst.getString(1), rst.getBigDecimal(2)});
+        }
+        return arrayList;
+    }
+
+    public ArrayList<Object[]> getItemReturnByCategory(int temId, String date, Connection connection) throws SQLException {
+        String query = "select trim(pos_m_item.cost_center) as category,\n"
+                + "	ifnull(sum(pos_t_transaction_details.final_value),0.00) as val\n"
+                + "from pos_t_transaction_details\n"
+                + "left join pos_t_transaction_summary on pos_t_transaction_summary.index_no=pos_t_transaction_details.tr_index_no\n"
+                + "left join pos_m_item on pos_m_item.barcode=pos_t_transaction_details.bar_code\n"
+                + "where pos_t_transaction_details.tr_det_type='item' and pos_t_transaction_summary.tr_type='return' \n"
+                + "and (2 is null or pos_t_transaction_summary.terminal_id=?)\n"
+                + "and pos_t_transaction_summary.tr_date=? and pos_t_transaction_summary.is_sync=0\n"
+                + "group by pos_m_item.cost_center\n"
+                + "HAVING val!=0";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setInt(1, temId);
+        preparedStatement.setString(2, date);
+        ResultSet rst = preparedStatement.executeQuery();
+        ArrayList<Object[]> arrayList = new ArrayList<>();
+        while (rst.next()) {
+            arrayList.add(new Object[]{"    " + rst.getString(1), rst.getBigDecimal(2)});
+        }
+        return arrayList;
+    }
+
+    public void saveAccLedger(HashMap<Integer, Object> det, Connection accConnection) throws SQLException {
+        String insertSql = "insert into t_acc_ledger (\n"
+                + "number,\n"
+                + "search_code,\n"
+                + "transaction_date,\n"
+                + "`current_date`,\n"
+                + "`time`,\n"
+                + "`branch`,\n"
+                + "current_branch,\n"
+                + "`user`,\n"
+                + "debit,\n"
+                + "credit,\n"
+                + "acc_account,\n"
+                + "form_name,\n"
+                + "`type`,\n"
+                + "delete_ref_no,\n"
+                + "description,\n"
+                + "financial_year,\n"
+                + "cost_center)\n"
+                + "values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement preparedStatement = accConnection.prepareStatement(insertSql);
+        preparedStatement.setInt(1, Integer.valueOf(det.get(1).toString()));
+        preparedStatement.setString(2, (det.get(2).toString()));
+        preparedStatement.setString(3, (det.get(3).toString()));
+        preparedStatement.setString(4, (det.get(4).toString()));
+        preparedStatement.setString(5, (det.get(5).toString()));
+        preparedStatement.setInt(6, Integer.valueOf(det.get(6).toString()));
+        preparedStatement.setInt(7, Integer.valueOf(det.get(7).toString()));
+        preparedStatement.setInt(8, Integer.valueOf(det.get(8).toString()));
+        preparedStatement.setBigDecimal(9, new BigDecimal(det.get(9).toString()));
+        preparedStatement.setBigDecimal(10, new BigDecimal(det.get(10).toString()));
+        preparedStatement.setInt(11, Integer.valueOf(det.get(11).toString()));
+        preparedStatement.setString(12, String.valueOf(det.get(12).toString()));
+        preparedStatement.setString(13, String.valueOf(det.get(13).toString()));
+        preparedStatement.setInt(14, Integer.valueOf(det.get(14).toString()));
+        preparedStatement.setString(15, String.valueOf(det.get(15).toString()));
+        preparedStatement.setInt(16, Integer.valueOf(det.get(16).toString()));
+        preparedStatement.setInt(17, Integer.valueOf(det.get(17).toString()));
+
+        preparedStatement.executeUpdate();
+    }
+
+    public Integer getNotCheckDataCount(String date, Connection accConnection) throws SQLException {
+        String query = "select count(pos_t_transaction_summary.index_no) as count\n"
+                + "from pos_t_transaction_summary\n"
+                + "where pos_t_transaction_summary.is_sync=0 and pos_t_transaction_summary.tr_date=?";
+        PreparedStatement preparedStatement = accConnection.prepareStatement(query);
+        preparedStatement.setString(1, date);
+        ResultSet rst = preparedStatement.executeQuery();
+        if (rst.next()) {
+            return rst.getInt(1);
+        }
+        throw new RuntimeException("Can't find Not Check Data");
     }
 
 }
