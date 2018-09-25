@@ -19,7 +19,7 @@ import java.util.Properties;
 public class ConnectionController {
 
     private static ConnectionController instance;
-//    private final DataSourceWrapper operationDataSourceWrapper;
+    private final DataSourceWrapper operationDataSourceWrapper;
     private final DataSourceWrapper accountDataSourceWrapper;
 
     public ConnectionController() throws SQLException {
@@ -31,9 +31,9 @@ public class ConnectionController {
         String accUser = null;
         String accPswd = null;
         
-//        String operaUrl = null;
-//        String operaUser = null;
-//        String operaPswd = null;
+        String operaUrl = null;
+        String operaUser = null;
+        String operaPswd = null;
         
         try {
 
@@ -48,14 +48,14 @@ public class ConnectionController {
             accUser = prop.getProperty("account_user");
             accPswd = prop.getProperty("account_password");
             
-//            operaUrl = prop.getProperty("opera_url");
-//            operaUser = prop.getProperty("opera_user");
-//            operaPswd = prop.getProperty("opera_password");
+            operaUrl = prop.getProperty("opera_url");
+            operaUser = prop.getProperty("opera_user");
+            operaPswd = prop.getProperty("opera_password");
 
         } catch (IOException ex) {
             System.out.println("Can't find database Connection !");
         }
-//        this.operationDataSourceWrapper = new DataSourceWrapper();
+        this.operationDataSourceWrapper = new DataSourceWrapper(operaUrl,operaUser,operaPswd);
         this.accountDataSourceWrapper = new DataSourceWrapper(accUrl, accUser, accPswd);
     }
     
@@ -66,9 +66,9 @@ public class ConnectionController {
         return instance;
     }
 
-//    public DataSourceWrapper getOperationDataSourceWrapper() {
-//        return operationDataSourceWrapper;
-//    }
+    public DataSourceWrapper getOperationDataSourceWrapper() {
+        return operationDataSourceWrapper;
+    }
 
     public DataSourceWrapper getAccuntDataSourceWrapper() {
         return accountDataSourceWrapper;

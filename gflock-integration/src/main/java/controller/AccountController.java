@@ -140,7 +140,7 @@ public class AccountController {
         return returnList;
     }
 
-    static Object[] saveAccount(int selectedTerminal, String date, Integer loginUser, ArrayList<Object[]> terminalDetail, Connection accConnection) throws SQLException {
+    static Object[] saveAccount(int selectedTerminal, String date, Integer loginUser, ArrayList<Object[]> terminalDetail, Connection accConnection,Connection operaConnection) throws SQLException {
         //get branch from login user
         totalDebit = new BigDecimal(0);
         totalCredit = new BigDecimal(0);
@@ -282,7 +282,7 @@ public class AccountController {
             }
             if ("18".equals(objects[4].toString())) {
                 // get cheque
-                setupSave("cheque_in_hand", new BigDecimal(objects[2].toString()), new BigDecimal(0), commonDetail, accConnection);
+                setupSave("cheque_in_hand", new BigDecimal(objects[3].toString()), new BigDecimal(0), commonDetail, accConnection);
 
             }
         }
@@ -313,7 +313,6 @@ public class AccountController {
             salesReturnTransaction.put(9, salesCostCenter[1]);
             salesReturnTransaction.put(17, salesCostCenter[0]);
             if (Double.valueOf(salesCostCenter[1].toString()) > 0) {
-                System.out.println("**** " + salesCostCenter[1].toString());
                 totalDebit = totalDebit.add(new BigDecimal(salesCostCenter[1].toString()));
                 saveAccLedger(salesReturnTransaction, accConnection);
             }
@@ -332,7 +331,6 @@ public class AccountController {
             lineDiscountTransaction.put(9, salesCostCenter[1]);
             lineDiscountTransaction.put(17, salesCostCenter[0]);
             if (Double.valueOf(salesCostCenter[1].toString()) > 0) {
-                System.out.println("**** " + salesCostCenter[1].toString());
                 totalDebit = totalDebit.add(new BigDecimal(salesCostCenter[1].toString()));
                 saveAccLedger(lineDiscountTransaction, accConnection);
             }
@@ -342,12 +340,12 @@ public class AccountController {
             throw new RuntimeException("line discount cost center save fail !");
         }
         if (totalDebit.compareTo(totalCredit) != 0) {
-            throw new RuntimeException("Total debit and Credit doesn't match ! TotalDebit : " + totalDebit + " TotalCredit : " + totalCredit);
+            throw new RuntimeException("Total debit and Credit doesn't match ! Total Debit : " + totalDebit + " Total Credit : " + totalCredit);
         }
 
         Object[] retData = {totalDebit.setScale(2, BigDecimal.ROUND_UP), totalCredit.setScale(2, BigDecimal.ROUND_UP), searchCode};
 
-        Integer updateTrSum = updateTrSum(selectedTerminal, date, accConnection);
+        Integer updateTrSum = updateTrSum(selectedTerminal, date, operaConnection);
         if (updateTrSum <= 0) {
             throw new RuntimeException("Tr_summary update failed !");
         }
@@ -393,7 +391,7 @@ public class AccountController {
     }
 
     private static BigDecimal getItemReturn(int temId, String date, Connection connection) throws SQLException {
-        String query = "Select sum(tr_final_value) as return_item_value \n"
+        String query = "Select ifnull(sum(tr_final_value),0.00) as return_item_value \n"
                 + "from temp_tr_details \n"
                 + "Where tr_status=2 \n"
                 + "and tr_type='return' \n"
@@ -584,7 +582,7 @@ public class AccountController {
         cashTransaction.put(9, debit);
         cashTransaction.put(10, credit);
         if (debit.doubleValue() > 0 || credit.doubleValue() > 0) {
-            System.out.println("**** " + debit);
+            System.out.println("debit : " + debit+"    credit :"+credit);
             totalDebit = totalDebit.add(debit);
             totalCredit = totalCredit.add(credit);
             saveAccLedger(cashTransaction, accConnection);

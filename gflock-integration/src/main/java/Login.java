@@ -42,11 +42,11 @@ public class Login extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         txtUserName = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtLoginPswd = new javax.swing.JPasswordField();
-        btnCancel = new javax.swing.JButton();
-        btnLogin = new javax.swing.JButton();
         lblwrong = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -56,49 +56,61 @@ public class Login extends javax.swing.JFrame {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 1, 36)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Bodoni MT", 1, 36)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("User Login");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, 240, -1));
 
+        jLabel3.setFont(new java.awt.Font("Bodoni MT", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("User Name :");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 100, -1, -1));
-        jPanel1.add(txtUserName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 120, 240, 30));
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, -1));
 
+        jLabel5.setBackground(new java.awt.Color(0, 102, 102));
+        jLabel5.setFont(new java.awt.Font("Bodoni MT", 1, 14)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("Login");
+        jLabel5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel5.setOpaque(true);
+        jLabel5.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel5MouseClicked(evt);
+            }
+        });
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 220, 110, 30));
+
+        jLabel6.setBackground(new java.awt.Color(204, 0, 102));
+        jLabel6.setFont(new java.awt.Font("Bodoni MT", 1, 14)); // NOI18N
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("Cancel");
+        jLabel6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel6.setOpaque(true);
+        jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel6MouseClicked(evt);
+            }
+        });
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 220, 110, 30));
+        jPanel1.add(txtUserName, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 110, 240, 30));
+
+        jLabel4.setFont(new java.awt.Font("Bodoni MT", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Password :");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 160, -1, -1));
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 150, -1, -1));
 
         txtLoginPswd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtLoginPswdActionPerformed(evt);
             }
         });
-        jPanel1.add(txtLoginPswd, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 180, 240, 30));
+        jPanel1.add(txtLoginPswd, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, 240, 30));
 
-        btnCancel.setText("Cancel");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnCancel, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 230, 110, -1));
-
-        btnLogin.setText("Login");
-        btnLogin.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLoginActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnLogin, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 230, 110, -1));
-
-        lblwrong.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        lblwrong.setFont(new java.awt.Font("Bodoni MT", 1, 15)); // NOI18N
         lblwrong.setForeground(new java.awt.Color(255, 51, 51));
         lblwrong.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblwrong.setText("User name or password is incorret !");
-        jPanel1.add(lblwrong, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 270, 240, -1));
+        jPanel1.add(lblwrong, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 260, 240, -1));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/background.jpg"))); // NOI18N
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-1, 0, 420, 310));
@@ -121,8 +133,12 @@ public class Login extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtLoginPswdActionPerformed
 
-    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        try {
+    private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
+        this.dispose();
+    }//GEN-LAST:event_jLabel6MouseClicked
+
+    private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
+       try {
             System.out.println("login");
 //          getUserLogin
             Integer loginUser = SyncController.getInstance().checkLoginUser(txtUserName.getText(), txtLoginPswd.getText());
@@ -144,13 +160,7 @@ public class Login extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-    }//GEN-LAST:event_btnLoginActionPerformed
-
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }//GEN-LAST:event_jLabel5MouseClicked
 
     /**
      * @param args the command line arguments
@@ -188,12 +198,12 @@ public class Login extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnLogin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblwrong;
     private javax.swing.JPasswordField txtLoginPswd;

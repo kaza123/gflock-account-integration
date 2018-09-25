@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import controller.TransactionController;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.JScrollBar;
 
 /**
  *
@@ -39,7 +40,6 @@ public class SyncController {
 
     public ArrayList<Object[]> setTerminalDetail(int temId, String date, Integer loginUser) throws SQLException {
         return TransactionController.getInstance().setTerminalDetail(temId,date,loginUser);
-        
     }
 
 

@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import javax.swing.JScrollBar;
 
 /**
  *
@@ -20,11 +21,13 @@ public class TransactionController {
 
     private static TransactionController instance;
     private final DataSourceWrapper accountDataSourceWrapper;
+    private final DataSourceWrapper operaDataSourceWrapper;
 
     public TransactionController() throws SQLException {
 
 //        
         this.accountDataSourceWrapper = ConnectionController.getInstance().getAccuntDataSourceWrapper();
+        this.operaDataSourceWrapper = ConnectionController.getInstance().getOperationDataSourceWrapper();
 
     }
 
@@ -106,7 +109,7 @@ public class TransactionController {
         Connection accConnection = null;
         HashMap map = new HashMap();
         try {
-            accConnection = accountDataSourceWrapper.getConnection();
+            accConnection = operaDataSourceWrapper.getConnection();
             map = AccountController.getDetailCount(date, terList, accConnection);
             accConnection.close();
             return map;
@@ -182,7 +185,7 @@ public class TransactionController {
         ArrayList<Object[]> setTerminalDetail = null;
 
         try {
-            accConnection = accountDataSourceWrapper.getConnection();
+            accConnection = operaDataSourceWrapper.getConnection();
             //Set auto commit as false.
             accConnection.setAutoCommit(false);
             setTerminalDetail = AccountController.setTerminalDetail(temId, date, loginUser, accConnection);
@@ -212,13 +215,15 @@ public class TransactionController {
 
     public Object[] saveAccount(int selectedTerminal, Integer loginUser, ArrayList<Object[]> terminalDetail, String date) {
         Connection accConnection = null;
+        Connection operaConnection = null;
         Object[] saveAccount=new Object[]{};
 
         try {
             accConnection = accountDataSourceWrapper.getConnection();
+            operaConnection = operaDataSourceWrapper.getConnection();
             //Set auto commit as false.
             accConnection.setAutoCommit(false);
-            saveAccount = AccountController.saveAccount(selectedTerminal, date, loginUser, terminalDetail, accConnection);
+            saveAccount = AccountController.saveAccount(selectedTerminal, date, loginUser, terminalDetail, accConnection,operaConnection);
 
             //commit
             accConnection.commit();
@@ -248,7 +253,7 @@ public class TransactionController {
         Integer count=0;
 
         try {
-            accConnection = accountDataSourceWrapper.getConnection();
+            accConnection = operaDataSourceWrapper.getConnection();
             //Set auto commit as false.
             accConnection.setAutoCommit(false);
             count = AccountController.getNotCheckDataCount(date,accConnection);
@@ -275,4 +280,5 @@ public class TransactionController {
         }
         return count;
     }
+
 }

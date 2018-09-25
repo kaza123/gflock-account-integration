@@ -394,6 +394,7 @@ public class AccountService {
                 + "left join pos_m_item on pos_m_item.barcode=pos_t_transaction_details.bar_code\n"
                 + "where (2 is null or pos_t_transaction_summary.terminal_id=?)\n"
                 + "and pos_t_transaction_summary.tr_date=? and pos_t_transaction_summary.is_sync=0\n"
+                + "and pos_t_transaction_summary.tr_type='invoice'\n"
                 + "group by pos_m_item.cost_center\n"
                 + "HAVING val!=0";
         PreparedStatement preparedStatement = connection.prepareStatement(query);
